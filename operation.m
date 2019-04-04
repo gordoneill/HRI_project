@@ -1,15 +1,9 @@
 function operation()
 
 %% Init Game
-% Init Myo class
-myo = Inputs.MyoUdp.getInstance();
-myo.initialize()
-% Init Leap class
-leap = Inputs.LeapMotion;
-leap.initialize();
-
-tool = initGame();
-robai = construct(zeros(1,6));
+[myo, leap, actin, unity] = initExternalDevices();
+tool = selectTool();
+robai = construct(actin, unity);
 robai.goHome();
 action = 'rest';
 
@@ -29,3 +23,5 @@ while ~strcmp(action, 'release')
         robai.move(traj, duration);
     end
 end
+
+cleanup;

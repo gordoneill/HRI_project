@@ -3,14 +3,18 @@ classdef robot < handle
     
     properties
         jointAngles
-        numJoints = 6;
-        homeValues = [1, 2, 3, 4, 5, 6];
+        actin
+        unity
+        numJoints = 8;
+        homeValues = [0 pi/4 0 pi/2 0 pi/2 0 0.01];
     end
     
     methods
         %% Constructor
-        function robai = construct(jointAngles)
-            robai.jointAngles = jointAngles;
+        function robai = construct(actin, unity)
+            robai.actin       = actin;
+            robai.unity       = unity;
+            robai.jointAngles = robai.homeValues;
         end
         
         %% Function to go to home angles
@@ -47,9 +51,12 @@ classdef robot < handle
         end
         
         %% Function to send the command
-        function [success] = sendCommand(jointAngles)
-            send(jointAngles);
-            success = 1;
+        function [success] = sendCommand(robai, jointAngles)
+            success = robai.actin.putData(typecast(jointAngles, 'uint8'));
+            
+            success = success && ...
+                robai.unity.putData(typecast(single(...
+                    [rad2deg(jointAngles(1:7)), jountAngles(8)]), 'uint8')); 
         end
     end
 end
