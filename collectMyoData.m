@@ -1,3 +1,7 @@
-function [myoData] = collectMyoData()
+function [myoData] = collectMyoData(myo)
 
-myoData = 0;
+myoData = myo.getData();
+
+if isempty(myo.Orientation)    
+    error('Myo data failed');
+end
