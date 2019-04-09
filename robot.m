@@ -11,10 +11,10 @@ classdef robot < handle
     
     methods
         %% Constructor
-        function robai = construct(actin, unity)
-            robai.actin       = actin;
-            robai.unity       = unity;
-            robai.jointAngles = robai.homeValues;
+        function obj = robot(actinIn, unityIn)
+            obj.actin       = actinIn;
+            obj.unity       = unityIn;
+            obj.jointAngles = obj.homeValues;
         end
         
         %% Function to go to home angles
@@ -43,7 +43,7 @@ classdef robot < handle
         function [success] = grip(robai, tool)
             switch(tool)
                 case 'tweasers'
-                    robai.jointAngles(6) = 5;
+                    robai.jointAngles(8) = 5;
                 otherwise
                     robai.jointAngles = 0;
             end

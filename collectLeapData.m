@@ -1,7 +1,3 @@
-function [leapData] = collectLeapData()
+function [leapData] = collectLeapData(leap)
 
-leapData = h.getData();   
-
-if isempty(leapData) || leapData.hands == 0
-    error('Leap data failed');
-end
+leapData = leap.getData();  

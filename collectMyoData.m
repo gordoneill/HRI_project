@@ -1,6 +1,6 @@
-function [myoData] = collectMyoData(myo)
+function [myoData] = collectMyoData(myo, trainObj)
 
-myoData = myo.getData();
+myoData = myo.getData(trainObj.NumSamplesPerWindow,1:8);
 
 if isempty(myo.Orientation)    
     error('Myo data failed');
