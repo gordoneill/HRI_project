@@ -2,6 +2,7 @@ function operation()
 
 %% Init Game
 [myo, leap, actin, unity] = initExternalDevices();
+Tools
 tool = selectTool();
 robai = robot(actin, unity);
 %robai.goHome();
