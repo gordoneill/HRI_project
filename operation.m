@@ -6,7 +6,7 @@ tool = selectTool();
 robai = robot(actin, unity);
 %robai.goHome();
 action = 'rest';
-trainObj = train('C:\GitHub\MiniVIE\gordon_finalProj.trainingData');
+trainObj = train(uigetfile('*.trainingData', 'Select Training Data'));
 
 while ~strcmp(action, 'release')
     %% Collect Data
@@ -15,14 +15,11 @@ while ~strcmp(action, 'release')
 
     %% Determine Action
     action = determineAction(trainObj, leapData, myoData);
-    [traj, duration] = determineTraj(action);
+    [traj, duration] = determineTraj(action, tool);
     
     %% Move Robot
-    if strcmp(action,'grip')
-        robai.grip(tool);
-    else
-        robai.move(traj, duration);
-    end
+    robai.move(traj, duration);
 end
 
+%robai.goHome();
 cleanup;

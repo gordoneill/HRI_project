@@ -1,20 +1,25 @@
 function [myo,leap,actin,unity] = initExternalDevices()
 
-thisPath = cd;
-cd('C:\GitHub\MiniVIE');
+addpath(pwd);
+addpath('C:\GitHub\MiniVIE');
 MiniVIE.configurePath;
-cd(thisPath);
-addpath('C:\git\HRI_project');
 
 % Init Myo class
 myo = Inputs.MyoUdp.getInstance();
 myo.initialize();
+system('C:\GitHub\lab3\myo.exe');
+
 % Init Leap class
 leap = Inputs.LeapMotion;
 leap.initialize();
+system('C:\GitHub\lab4\leap.py');
+
 % % Init Actin Viewer
 actin = PnetClass(8889, 8888, '127.0.0.1');
 actin.initialize();
+system('C:\GitHub\MiniVIE\activ.exe');
+
 % % Init Unity vCyton
 unity = PnetClass(12002, 12001, '127.0.0.1');
 unity.initialize();
+system('C:\GitHub\MiniVIE\unity.exe');
