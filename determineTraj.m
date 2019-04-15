@@ -1,18 +1,32 @@
 function [traj, duration] = determineTraj(action, tool)
 
+isMove = false;
+
 switch(action)
     case 'up'
-        
+        isMove = true;
+        axis = 'z';
+        pol = 1;
     case 'down'
-        
+        isMove = true;
+        axis = 'z';
+        pol = -1;
     case 'left'
-        
+        isMove = true;
+        axis = 'x';
+        pol = 1;
     case 'right'
-        
+        isMove = true;
+        axis = 'x';
+        pol = -1;
     case 'forward'
-        
+        isMove = true;
+        axis = 'y';
+        pol = 1;
     case 'reverse'
-        
+        isMove = true;
+        axis = 'y';
+        pol = -1;
     case 'rotateIn'
         
     case 'rotateOut'
@@ -31,3 +45,10 @@ switch(action)
         duration = 0.5;
         traj = zeros(4,4);
 end
+
+if (isMove)
+   traj = move1D(axis, pol, curPose); % returns array of end effector positions to get to trajectory
+end
+
+
+end 
