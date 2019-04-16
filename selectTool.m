@@ -1,6 +1,7 @@
 function tool = selectTool()
 %get list of tools 
-Tools
+global tools;
+addpath('C:\git\HRI_project\speech2text');
 
 % Create speech client for speech2text toolbox 
 speechObject = speechClient('Google','languageCode','en-US');
@@ -10,8 +11,9 @@ tool = "";
 isSelected = false; 
 while(~isSelected)
     % prompt for tool
+    % TODO speach @ us and/or popup
     disp("Please specify a tool");
-    input('Press enter to start recording')
+    input('Press enter to start recording');
 
     % user responds
     recorder = audiorecorder(sample_freq,8,1);

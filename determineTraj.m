@@ -1,4 +1,4 @@
-function [traj, duration] = determineTraj(action, tool)
+function traj = determineTraj(action, tool)
 
 isMove = false;
 
@@ -42,8 +42,7 @@ switch(action)
     case 'release'
         
     otherwise
-        duration = 0.5;
-        traj = zeros(4,4);
+        error('Unsupported move');
 end
 
 if (isMove)

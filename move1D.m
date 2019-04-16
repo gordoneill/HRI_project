@@ -4,6 +4,8 @@ function  traj = move1D(axis, pol, curPose)
 %curPose contains the current pose of the end effector 
 
 % Here we define the limits in the world frame of the arm
+global robaiBot; 
+
 xrange = [-10 10];
 yrange = [-10 10];
 zrange = [-10 10]; 
@@ -31,9 +33,11 @@ end
 
 % create trajectory
 t = [0:0.1:4]';
+
+robaiBot.ikine();
 traj = curPose.interp(destPose, tpoly(0, 1, t));
 
-%tranimate(traj)
+tranimate(traj)
 
 end
 

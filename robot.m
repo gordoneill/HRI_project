@@ -24,7 +24,7 @@ classdef robot < handle
         end
         
         %% Function to move robot in a trajectory
-        function [success] = move(robai, traj, duration)
+        function [success] = move(robai, traj)
             timeStep = size(traj, 2) / duration;
             for step = 1:size(traj, 2)
                 robai.jointAngles = traj(step);
@@ -52,9 +52,9 @@ classdef robot < handle
         
         %% Function to send the command
         function [success] = sendCommand(robai, jointAngles)
-            success = robai.actin.putData(typecast(jointAngles, 'uint8'));
+            %success = robai.actin.putData(typecast(jointAngles, 'uint8'));
             
-            success = success && ...
+            success = ...
                 robai.unity.putData(typecast(single(...
                     [rad2deg(jointAngles(1:7)), jountAngles(8)]), 'uint8')); 
         end
