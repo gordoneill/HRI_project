@@ -1,15 +1,15 @@
 function operation()
-global robai;
 
 %% Init Game
-[myo, leap, actin, unity] = initExternalDevices();
 globals;
-%tool = selectTool();
-tool = 'wrench';
-robai = robot(actin, unity);
-%robai.goHome();
-action = 'rest';
-%trainObj = train(uigetfile('*.trainingData', 'Select Training Data'));
+[myo, leap, actin, unity] = initExternalDevices();
+
+tool       = selectTool();
+robai      = robot(actin, unity);
+action     = 'rest';
+lastAction = 'rest';
+trainObj   = train(uigetfile('*.trainingData', 'Select Training Data'));
+robai.goHome();
 
 while ~strcmp(action, 'release')
     %% Collect Data
@@ -18,11 +18,16 @@ while ~strcmp(action, 'release')
 
     %% Determine Action
     action = determineAction(trainObj, leapData, myoData);
-    traj = determineTraj('up', tool);
     
-    %% Move Robot
-    robai.move(traj);
+    if ~strcmp(action, 'rest') && strcmp(action, lastAction) % need action twice to enact
+        traj = determineTraj(action, tool);
+
+        %% Move Robot
+        robai.move(traj);
+    end
+    
+    lastAction = action;
 end
 
-%robai.goHome();
+robai.goHome();
 cleanup;

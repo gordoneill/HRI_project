@@ -1,7 +1,11 @@
 global tools;
+global commands;
 global robaiBot;
 
-tools = ["wrench"; "tweezers"; "scalpel"; "knife"; "probe"];
+tools = ['wrench'; 'tweezers'; 'scalpel'; 'knife'; 'probe'];
+
+commands = ['up','down','left','right','forward','reverse',...
+    'rotateIn','rotateOut','rest','grip','release'];
 
 links = [     
 		  Revolute('d', 0.74, 'a', 0, 'alpha', pi/2)

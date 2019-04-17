@@ -49,5 +49,4 @@ if (isMove)
    traj = move1D(axis, pol, curPose); % returns array of end effector positions to get to trajectory
 end
 
-
 end 
