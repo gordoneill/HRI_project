@@ -32,62 +32,63 @@ disp(myoAction);
 
 %% Determine Leap Action
 if isfield(leapData, 'hand')
-    numHands          = length(leapData.hand);
-    typicalNumFingers = 5;
-    forwardFingersR   = [0 1 0 0 0];
-    forwardFingersL   = [0 0 0 1 0];
-    reverseFingers    = [1 0 0 0 1];
-    rotateInFingers   = [1 0 0 1 1];
-    rotateOutFingers  = [1 1 0 0 1];
-    angleDegreeThresh = [5 25.0];
-    fingersOut        = zeros(numHands, typicalNumFingers);
+    numHands          = leapData.hands;
+    typicalFingers    = {'Thumb', 'Index', 'Middle', 'Ring', 'Pinky'};
+    typicalNumFingers = length(typicalFingers);
+    forwardFingers    = {'Index'};
+    reverseFingers    = {'Thumb', 'Pinky'};
+    rotateInFingers   = {'Thumb', 'Index', 'Pinky'};
+    rotateOutFingers  = {'Thumb', 'Index'};
+    angleDegreeThresh = containers.Map(typicalFingers,{20, 25, 25, 25, 38});
+    fingersOut        = containers.Map(typicalFingers,{0, 0, 0, 0, 0});
 
     % decode leap data
     for curHand = 1:numHands
-        numFingers = length(leapData.hand(curHand).finger);
+        numFingers = leapData.fingers;
         if numFingers ~= typicalNumFingers
             disp('Hand has less than 5 fingers?');
         else
             for curFinger = 1:numFingers
-                curAngle = LinAlg.Anglebetween( ...
-                    leapData.hand(curHand).finger(curFinger).bone(2).direction.', ...
-                    leapData.hand(curHand).finger(curFinger).bone(3).direction.');
+                fingerName = leapData.hand(curHand).finger(curFinger).name;
                 
-                if strcmp(leapData.hand(curHand).finger(curFinger).name, 'Thumb')
+                if strcmp(fingerName, 'Thumb')
                     curAngle = LinAlg.Anglebetween( ...
                         leapData.hand(curHand).finger(curFinger).bone(3).direction.', ...
                         leapData.hand(curHand).finger(curFinger).bone(4).direction.');
+                else
+                    curAngle = LinAlg.Anglebetween( ...
+                        leapData.hand(curHand).finger(curFinger).bone(1).direction.', ...
+                        leapData.hand(curHand).finger(curFinger).bone(2).direction.');
                 end
-
-                isFingerOut = ((curAngle > angleDegreeThresh(1)) && (curAngle < angleDegreeThresh(2)));
                 
-                fingersOut(curHand, curFinger) = isFingerOut;
+                fingersOut(fingerName) = (curAngle < angleDegreeThresh(fingerName));
             end
         end
     end
 
     % Interpret leap action
     for curHand = 1:numHands
-        forwardPos   = isequal(fingersOut(curHand, :), forwardFingersR) || ...
-                            isequal(fingersOut(curHand, :), forwardFingersL);
-        reversePos   = isequal(fingersOut(curHand, :), reverseFingers);
-        rotateInPos  = isequal(fingersOut(curHand, :), rotateInFingers);
-        rotateOutPos = isequal(fingersOut(curHand, :), rotateOutFingers);
-
-        if forwardPos
+        fingerOutList = {};
+        leapAction = 'rest';
+        
+        for finger = 1:typicalNumFingers
+            if fingersOut(typicalFingers{finger})
+                fingerOutList{end + 1} = typicalFingers{finger};
+            end
+        end
+        
+        if listsMatch(forwardFingers, fingerOutList)
             leapAction = 'forward'; 
             break;
-        elseif reversePos
+        elseif listsMatch(reverseFingers, fingerOutList)
             leapAction = 'reverse';
             break;
-        elseif rotateInPos
+        elseif listsMatch(rotateInFingers, fingerOutList)
             leapAction = 'rotateIn';
             break;
-        elseif rotateOutPos
+        elseif listsMatch(rotateOutFingers, fingerOutList)
             leapAction = 'rotateOut';
             break;
-        else
-            leapAction = 'rest';
         end
     end
 else
