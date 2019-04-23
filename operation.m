@@ -1,31 +1,35 @@
 function operation()
-
+global qhome;
 %% Init Game
 globals;
 [myo, leap, actin, unity] = initExternalDevices();
 
-tool       = selectTool();
+%tool       = selectTool();
 robai      = robot(actin, unity);
 action     = 'rest';
 lastAction = 'rest';
-trainObj   = train(uigetfile('*.trainingData', 'Select Training Data'));
-robai.goHome();
+trainObj   = train('C:\GitHub\MiniVIE\gordon_finalProj.trainingData');
+qhome(2) = (pi/2)-qhome(2);
+success = robai.goHome(qhome);
 
 while ~strcmp(action, 'release')
     %% Collect Data
-    myoData  = collectMyoData(myo, trainObj);
-    leapData = collectLeapData(leap);
+%     myoData  = collectMyoData(myo, trainObj);
+%     leapData = collectLeapData(leap);
+% 
+%     %% Determine Action
+%     action = determineAction(trainObj, leapData, myoData);
 
-    %% Determine Action
-    action = determineAction(trainObj, leapData, myoData);
+    action = 'rest';
+    tool = 'wrench';
     
     if ~strcmp(action, 'rest') && strcmp(action, lastAction) % need action twice to enact
-        traj = determineTraj(action, tool);
+        [traj, timesteps]  = determineTraj(action, tool);
 
         %% Move Robot
-        robai.move(traj);
+        robai.move(traj, timesteps);
     end
-    
+    pause(0.1);
     lastAction = action;
 end
 

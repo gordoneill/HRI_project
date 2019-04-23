@@ -1,12 +1,11 @@
 classdef robot < handle
     % robai robotic arm
-    
     properties
         jointAngles
         actin
         unity
         numJoints = 8;
-        homeValues = [0 pi/4 0 pi/2 0 pi/2 0 0.01];
+        homeValues = [0 0 0 0 0 0 0 0];
     end
     
     methods
@@ -18,18 +17,21 @@ classdef robot < handle
         end
         
         %% Function to go to home angles
-        function [success] = goHome(robai)
-            robai.jointAngles = robai.homeValues;
-            success = sendCommand(robai.jointAngles);
+        function [success] = goHome(robai, qHome)
+            robai.jointAngles(1:2) = qHome(1:2);
+            robai.jointAngles(4) = qHome(3);
+            robai.jointAngles(6) = qHome(4);
+%             robai.jointAngles(1) = robai.homeValues;
+            success = robai.sendCommand(robai.jointAngles);
         end
         
         %% Function to move robot in a trajectory
-        function [success] = move(robai, traj)
-            timeStep = size(traj, 2) / duration;
+        function [success] = move(robai, traj, timesteps)
+            timediff = timesteps(2) - timesteps(1);
             for step = 1:size(traj, 2)
-                robai.jointAngles = traj(step);
-                success = sendCommand(robai.jointAngles);
-                sleep(timeStep);
+                robai.jointAngles = traj(:, step);
+                success = robai.sendCommand(robai.jointAngles.');
+                pause(timediff);
             end
         end
         
@@ -53,10 +55,9 @@ classdef robot < handle
         %% Function to send the command
         function [success] = sendCommand(robai, jointAngles)
             %success = robai.actin.putData(typecast(jointAngles, 'uint8'));
-            
-            success = ...
-                robai.unity.putData(typecast(single(...
-                    [rad2deg(jointAngles(1:7)), jountAngles(8)]), 'uint8')); 
+            success = 1;
+            robai.unity.putData(typecast(single(...
+                    [rad2deg(jointAngles(1:7)), jointAngles(8)]), 'uint8')); 
         end
     end
 end

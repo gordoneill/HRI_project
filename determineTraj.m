@@ -1,4 +1,4 @@
-function traj = determineTraj(action, tool)
+function [traj, timesteps] = determineTraj(action, tool)
 
 isMove = false;
 
@@ -46,7 +46,7 @@ switch(action)
 end
 
 if (isMove)
-   traj = move1D(axis, pol, curPose); % returns array of end effector positions to get to trajectory
+   [traj, timesteps ] = move1D(axis, pol); % returns array of end effector positions to get to trajectory
 end
 
 end 
