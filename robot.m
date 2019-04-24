@@ -18,9 +18,7 @@ classdef robot < handle
         
         %% Function to go to home angles
         function [success] = goHome(robai, qHome)
-            robai.jointAngles(1:2) = qHome(1:2);
-            robai.jointAngles(4) = qHome(3);
-            robai.jointAngles(6) = qHome(4);
+            robai.jointAngles = qHome;
 %             robai.jointAngles(1) = robai.homeValues;
             success = robai.sendCommand(robai.jointAngles);
         end

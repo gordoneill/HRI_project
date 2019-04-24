@@ -1,14 +1,17 @@
 function  [ jointAngles, t ] = move1D(axis, pol) 
 %axis will contain x, y, or z (in the world frame
 %pol will contain the polarity to move (1 or -1)
-%curPose contains the current pose of the end effector 
 
 % Here we define the limits in the world frame of the arm
 global robaiBot; 
 global curPose;
-global maxs;
-global mins;
-jointAngles = [];
+
+deg = pi/180;
+% Joint ranges
+mins = [  0 -15  -105 -105]*deg; 
+maxs = [180  90  105  105]*deg;
+
+% Cartesian space ranges
 xrange = [-0.390 0.390];
 yrange = [0 0.390];
 zrange = [0.02  0.1]; 
@@ -20,14 +23,16 @@ switch(axis)
     case 'x'
         destX = curPose.t(1) + (pol*xyDist); 
         rad = sqrt(destX^2 + curPose.t(2)^2);
-        if (destX < xrange(1))
+        isDistRange = isinrange(destX, xrange(1), xrange(2));
+        isRadRange = isinrange(rad, radLims(1), radLims(2));
+        if isDistRange == -1
             dist = curPose.t(1) - xrange(1); 
-        elseif  (destX > xrange(2))
+        elseif  isDistRange == 1
             dist = xrange(2) - curPose.t(1); 
-        elseif (rad < radLims(1))
+        elseif isRadRange == -1
             newX = sqrt(radLims(1)^2 - curPose.t(2)^2);
             dist = newX - curPose.t(1);
-        elseif (rad > radLims(2))
+        elseif isRadRange == 1
             newX = sqrt(radLims(2)^2 - curPose.t(2)^2);
             dist = newX - curPose.t(1);
         else 
@@ -37,15 +42,16 @@ switch(axis)
     case 'y'
         destY = curPose.t(2) + (pol*xyDist); 
         rad = sqrt(destY^2 + curPose.t(1)^2);
-
-        if (destY < yrange(1))
+        isDistRange = isinrange(destY, yrange(1), yrange(2));
+        isRadRange = isinrange(rad, radLims(1), radLims(2));
+        if isDistRange == -1
             dist = curPose.t(2) - yrange(1); 
-        elseif  (destY > yrange(2))
+        elseif  isDistRange == 1
             dist = yrange(2) - curPose.t(2); 
-        elseif (rad < radLims(1))
+        elseif isRadRange == -1
             newY = sqrt(radLims(1)^2 - curPose.t(1)^2);
             dist = newY - curPose.t(2);
-        elseif (rad > radLims(2))
+        elseif isRadRange == 1
             newY = sqrt(radLims(2)^2 - curPose.t(1)^2);
             dist = newY - curPose.t(2);
         end 
@@ -73,13 +79,14 @@ dest = robaiBot.ikine(destPose, 'mask', [1 1 1 0 0 1]);
 
 % Check joint angle ranges 
 for i=1:length(dest)
-    if (dest(i) > maxs(i))
+    isRange = isinrange(dest(i), mins(i), maxs(i));
+    if isRange == 1
         fprintf("Joint angle %d exceeds limits. Is %d, cannot be greater than %d\n", i, dest(i), maxs(i));
         if (i ~= length(dest))
             dest(i+1) = dest(i+1) + (dest(i) - mins(i));
         end
         dest(i) = maxs(i);
-    elseif (dest(i) < mins(i))
+    elseif isRange == -1
         fprintf("Joint angle %d exceeds limits. Is %d, cannot be less than %d\n", i, dest(i), mins(i));
         if (i ~= length(dest))
              dest(i+1) = dest(i+1) + (dest(i) - mins(i));
@@ -94,26 +101,14 @@ t = [0:st:4]';
 
 
 poses = curPose.interp(destPose, tpoly(0, 1, t));
-%robaiBot.plot(traj)
+
 angles = zeros(length(dest), length(poses));
 
 for i=1:length(poses)
-     %Send joint angles to bot in steps
-     %Want each move to take ~4 seconds
-     %each step ~0.1 seconds (st) 
     angles(:, i) = robaiBot.ikine(poses(i), 'mask', [1 1 1 0 0 1]);
-
-%     success = robai.unity.putData(typecast(single(...
-%               [rad2deg(jointAngles(1:7)), jointAngles(8)]), 'uint8')); 
-%     if (~success)
-%         disp("Failed to put data on robai");
-%     end
-%     pause(st);
 end
-jointAngles = zeros(8,length(poses));
 
-jointAngles(1:2,:) = angles(1:2, :);
-jointAngles(4,:) = angles(3, :);
-jointAngles(6,:) = angles(4, :);
+jointAngles = convertRobotAnglestoJointAngles(angles);
+
 end
 

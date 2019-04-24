@@ -9,7 +9,6 @@ robai      = robot(actin, unity);
 action     = 'rest';
 lastAction = 'rest';
 trainObj   = train('C:\GitHub\MiniVIE\gordon_finalProj.trainingData');
-qhome(2) = (pi/2)-qhome(2);
 success = robai.goHome(qhome);
 
 while ~strcmp(action, 'release')
