@@ -27,10 +27,12 @@ classdef robot < handle
         function [success] = move(robai, traj, timesteps)
             timediff = timesteps(2) - timesteps(1);
             for step = 1:size(traj, 2)
-                robai.jointAngles = traj(:, step);
-                success = robai.sendCommand(robai.jointAngles.');
+                disp("Moving");
+                robai.jointAngles = traj(step, :);
+                success = robai.sendCommand(robai.jointAngles);
                 pause(timediff);
             end
+            
         end
         
         %% Function to move specific robot joint

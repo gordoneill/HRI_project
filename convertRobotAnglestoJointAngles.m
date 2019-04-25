@@ -5,7 +5,7 @@ numVecs = 0;
 %want to modify
 if len == 4
     numVecs = wid; 
-    robotAngles = robotAngles.'
+    robotAngles = robotAngles.';
 elseif wid == 4
     numVecs = len;
 else
@@ -14,8 +14,10 @@ else
 end
 
 %% Make changes to angle values to correspond to actual joint angles 
-robotAngles(2) = (pi/2) - robotAngles(2);
-
+robotAngles(:, 1) = robotAngles(:, 1) - (pi/2);
+robotAngles(:, 2) = (pi/2) - robotAngles(:, 2);
+robotAngles(:, 3) = -1*robotAngles(:, 3);
+robotAngles(:, 4) = -1*robotAngles(:, 4);
 
 %% Create vector for joint angles
 jointAngles = zeros(numVecs, 8);

@@ -10,9 +10,9 @@ classNames = trainObj.getClassNames;
 myoMovement = classNames{classDecision};
 
 switch (myoMovement)
-    case 'Wrist Inflection'
+    case 'Wrist Extend Out'
         myoAction = 'up';
-    case 'Wrist Extension'
+    case 'Wrist Flex In'
         myoAction = 'down';
     case 'Wrist Adduction'
         myoAction = 'left';
@@ -28,7 +28,7 @@ switch (myoMovement)
         myoAction = 'rest';
 end
 
-disp(myoAction);
+% disp(myoAction);
 
 %% Determine Leap Action
 if isfield(leapData, 'hand')
@@ -39,7 +39,7 @@ if isfield(leapData, 'hand')
     reverseFingers    = {'Thumb', 'Pinky'};
     rotateInFingers   = {'Thumb', 'Index', 'Pinky'};
     rotateOutFingers  = {'Thumb', 'Index'};
-    angleDegreeThresh = containers.Map(typicalFingers,{20, 25, 25, 25, 38});
+    angleDegreeThresh = containers.Map(typicalFingers,{35, 25, 25, 25, 40});
     fingersOut        = containers.Map(typicalFingers,{0, 0, 0, 0, 0});
 
     % decode leap data
@@ -54,14 +54,18 @@ if isfield(leapData, 'hand')
                 if strcmp(fingerName, 'Thumb')
                     curAngle = LinAlg.Anglebetween( ...
                         leapData.hand(curHand).finger(curFinger).bone(3).direction.', ...
-                        leapData.hand(curHand).finger(curFinger).bone(4).direction.');
+                        leapData.hand(curHand).finger(2).bone(1).direction.');
+                    
+                    fingersOut(fingerName) = (curAngle > angleDegreeThresh(fingerName));
                 else
                     curAngle = LinAlg.Anglebetween( ...
                         leapData.hand(curHand).finger(curFinger).bone(1).direction.', ...
                         leapData.hand(curHand).finger(curFinger).bone(2).direction.');
+                    
+                    fingersOut(fingerName) = (curAngle < angleDegreeThresh(fingerName));
                 end
                 
-                fingersOut(fingerName) = (curAngle < angleDegreeThresh(fingerName));
+                
             end
         end
     end
@@ -95,7 +99,7 @@ else
     leapAction = 'rest';
 end
 
-disp(['leap action: ' leapAction]);
+% disp(['leap action: ' leapAction]);
 
 %% Return Game Action
 if strcmp(leapAction, 'rest')
@@ -103,3 +107,4 @@ if strcmp(leapAction, 'rest')
 else
     action = leapAction;
 end
+action

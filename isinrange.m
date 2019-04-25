@@ -3,9 +3,9 @@ function [isRange] = isinrange(val, min, max)
 % returns -1 if below min
 % returns 1 if above max 
 
-if (val <= max)
+if (val <= min)
     isRange = -1;
-elseif (val >= min)
+elseif (val >= max)
    isRange = 1; 
 else
    isRange = 0;

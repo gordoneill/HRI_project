@@ -1,19 +1,23 @@
 function [myo,leap,actin,unity] = initExternalDevices()
 
-addpath(pwd);
-addpath('C:\GitHub\MiniVIE');
-MiniVIE.configurePath;
+% addpath(pwd);
+% addpath('C:\GitHub\MiniVIE');
+% MiniVIE.configurePath();
+currDir = cd;
+cd('C:\GitHub\MiniVIE');
+MiniVIE.configurePath();
+cd(currDir);
 
 % % Init Myo class
 UserConfig.getInstance('C:\GitHub\MiniVIE\user_config.xml')
 myo = Inputs.MyoUdp.getInstance();
 myo.initialize();
-%system('C:\GitHub\MiniVIE\+Inputs\MyoUdp.exe');
+% system('C:\GitHub\MiniVIE\+Inputs\MyoUdp.exe');
 % 
 % % Init Leap class
 leap = Inputs.LeapMotion;
 leap.initialize();
-%system('C:\GitHub\hrilabs\Lab4_FingerControl\StartLeapStream.bat');
+% system('C:\GitHub\hrilabs\Lab4_FingerControl\StartLeapStream.bat');
 
 % % Init Actin Viewer
 actin = PnetClass(8889, 8888, '127.0.0.1');
@@ -23,4 +27,4 @@ actin.initialize();
 % % Init Unity vCyton
 unity = PnetClass(12002, 12001, '127.0.0.1');
 unity.initialize();
-%system('C:\GitHub\MiniVIE\unity.exe');
+%system('C:\GitHub\hrilabs\Applications\vCyton\vCyton_ForEPOnly.exe');

@@ -8,16 +8,21 @@ global curPose;
 
 deg = pi/180;
 % Joint ranges
-mins = [  0 -15  -105 -105]*deg; 
+mins = [-180 -15  -105 -105]*deg; 
 maxs = [180  90  105  105]*deg;
+jointAngles = [];
+
+% Create the trajectory 
+st = 0.1;
+t = [0:st:1]';
 
 % Cartesian space ranges
-xrange = [-0.390 0.390];
-yrange = [0 0.390];
-zrange = [0.02  0.1]; 
-radLims = [0.209 0.390];
+xrange = [-1 1];
+yrange = [0 1];
+zrange = [0.034  0.1]; 
+radLims = [0.0 1.5];
 xyDist = 0.05; % 5 cm
-zDist = 0.08; %Must fluctuate between 0.02m and 0.1m
+zDist = zrange(2) - zrange(1); %Must fluctuate between 0.02m and 0.1m
 
 switch(axis)
     case 'x'
@@ -36,7 +41,7 @@ switch(axis)
             newX = sqrt(radLims(2)^2 - curPose.t(2)^2);
             dist = newX - curPose.t(1);
         else 
-            dist = 0;
+            dist = xyDist;
         end 
         translation = SE3(pol*dist, 0, 0);
     case 'y'
@@ -54,6 +59,8 @@ switch(axis)
         elseif isRadRange == 1
             newY = sqrt(radLims(2)^2 - curPose.t(1)^2);
             dist = newY - curPose.t(2);
+        else
+            dist = xyDist;
         end 
         translation = SE3(0, pol*dist, 0);        
     case 'z'
@@ -74,7 +81,7 @@ switch(axis)
 end
 destPose = curPose * translation;
 
-start = robaiBot.ikine(curPose, 'mask', [1 1 1 0 0 1]);
+% start = robaiBot.ikine(curPose, 'mask', [1 1 1 0 0 1]);
 dest = robaiBot.ikine(destPose, 'mask', [1 1 1 0 0 1]);
 
 % Check joint angle ranges 
@@ -95,20 +102,15 @@ for i=1:length(dest)
     end
 end
 
-% Create the trajectory 
-st = 0.5;
-t = [0:st:4]';
-
-
 poses = curPose.interp(destPose, tpoly(0, 1, t));
-
+% disp(destPose);
 angles = zeros(length(dest), length(poses));
 
 for i=1:length(poses)
     angles(:, i) = robaiBot.ikine(poses(i), 'mask', [1 1 1 0 0 1]);
 end
-
+% disp(angles);
 jointAngles = convertRobotAnglestoJointAngles(angles);
-
+curPose = destPose;
 end
 
