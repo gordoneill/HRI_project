@@ -18,8 +18,10 @@ switch (myoMovement)
         myoAction = 'left';
     case 'Wrist Abduction'
         myoAction = 'right';
-    case 'No Movement'
-        myoAction = 'rest';
+    case 'Wrist Rotate In'
+        myoAction = 'rotateIn';
+    case 'Wrist Rotate Out'
+        myoAction = 'rotateOut';
     case 'Hand Open'
         myoAction = 'release';
     case 'Spherical Grasp'
@@ -28,8 +30,6 @@ switch (myoMovement)
         myoAction = 'rest';
 end
 
-% disp(myoAction);
-
 %% Determine Leap Action
 if isfield(leapData, 'hand')
     numHands          = leapData.hands;
@@ -37,8 +37,8 @@ if isfield(leapData, 'hand')
     typicalNumFingers = length(typicalFingers);
     forwardFingers    = {'Index'};
     reverseFingers    = {'Thumb', 'Pinky'};
-    rotateInFingers   = {'Thumb', 'Index', 'Pinky'};
-    rotateOutFingers  = {'Thumb', 'Index'};
+%     rotateInFingers   = {'Thumb', 'Index', 'Pinky'};
+%     rotateOutFingers  = {'Thumb', 'Index'};
     angleDegreeThresh = containers.Map(typicalFingers,{35, 25, 25, 25, 40});
     fingersOut        = containers.Map(typicalFingers,{0, 0, 0, 0, 0});
 
@@ -87,19 +87,17 @@ if isfield(leapData, 'hand')
         elseif listsMatch(reverseFingers, fingerOutList)
             leapAction = 'reverse';
             break;
-        elseif listsMatch(rotateInFingers, fingerOutList)
-            leapAction = 'rotateIn';
-            break;
-        elseif listsMatch(rotateOutFingers, fingerOutList)
-            leapAction = 'rotateOut';
-            break;
+%         elseif listsMatch(rotateInFingers, fingerOutList)
+%             leapAction = 'rotateIn';
+%             break;
+%         elseif listsMatch(rotateOutFingers, fingerOutList)
+%             leapAction = 'rotateOut';
+%             break;
         end
     end
 else
     leapAction = 'rest';
 end
-
-% disp(['leap action: ' leapAction]);
 
 %% Return Game Action
 if strcmp(leapAction, 'rest')
@@ -107,4 +105,5 @@ if strcmp(leapAction, 'rest')
 else
     action = leapAction;
 end
-action
+
+disp(['Action: ' action]);
