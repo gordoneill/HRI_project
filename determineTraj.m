@@ -46,7 +46,8 @@ switch(action)
 end
 
 if (isMove)
-   [traj, timesteps ] = move1D(axis, pol); % returns array of end effector positions to get to trajectory
+    % returns array of end effector positions to get to trajectory
+    [traj, timesteps ] = move1D(axis, pol); 
 end
 
 end 
