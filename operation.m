@@ -8,18 +8,18 @@ globals;
 robai      = robot(actin, unity);
 action     = 'rest';
 lastAction = 'rest';
-trainObj   = train('C:\GitHub\MiniVIE\gordon_finalProj.trainingData');
+% trainObj   = train('C:\GitHub\MiniVIE\gordon_finalProj.trainingData');
 robai.goHome(qhome);
 
 while ~strcmp(action, 'release')
     %% Collect Data
-    myoData  = collectMyoData(myo, trainObj);
-    leapData = collectLeapData(leap);
+%     myoData  = collectMyoData(myo, trainObj);
+%     leapData = collectLeapData(leap);
 
     %% Determine Action
-    action = determineAction(trainObj, leapData, myoData);
+%     action = determineAction(trainObj, leapData, myoData);
 
-%     action = 'rest';
+    action = 'rest';
     tool = 'wrench';
     
     if ~strcmp(action, 'rest') && strcmp(action, lastAction) % need action twice to enact
