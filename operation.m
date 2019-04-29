@@ -27,6 +27,7 @@ while ~strcmp(action, 'release')
 
         % Move Robot
         if ~isempty(traj)
+            disp('Moving');
             robai.move(traj, timesteps);  
         end
     else

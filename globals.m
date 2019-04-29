@@ -3,9 +3,11 @@ global commands;
 global robaiBot;
 global curPose;
 global qhome;
+global toolWidth; 
+
 
 tools = ["wrench"; "tweezers"; "scalpel"; "knife"; "probe"];
-
+toolWidth = [2.5; 3; 4; 1.5; 2];
 commands = ["up"; "down"; "left"; "right"; "forward"; "reverse";...
     "rotateIn"; "rotateOut"; "rest"; "grip"; "release"];
 
@@ -23,7 +25,6 @@ links = [
  		  Revolute('d', 0,       'a', 0.07164,   'alpha', pi/2,  'offset', pi/2)
  		  Revolute('d', 0,       'a', 0,         'alpha', -pi/2, 'offset', -pi/2)
  		  Revolute('d', 0.17252, 'a', 0,         'alpha', 0,     'offset', 0)
-          
         ];
 
 robaiBot =  SerialLink(links, 'name', 'Cyton Gamma 1500', 'manufacturer', 'Robai');
