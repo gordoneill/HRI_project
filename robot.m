@@ -17,22 +17,11 @@ classdef robot < handle
         end
         
         %% Function to go to home angles
-        function [success] = goHome(robai, qHome, curPose)
+        function [success] = goHome(robai, curJoints, qHome)
             st = 0.1;
-            t = [0:st:0.5]';
-            destPose = robaiBot.fkine(qHome);
-            poses = curPose.interp(destPose, tpoly(0, 1, t));
-            angles = zeros(length(qHome), length(poses));
-            for i=1:length(poses)
-                 curAngles = robaiBot.ikine(poses(i));
-                 if (isempty(curAngles))
-                    angles(:, i) = angles(:,i); 
-                 end
-                 angles(:, i) = curAngles;
-            end
-            % disp(angles);
-            jointAngles = convertRobotAnglestoJointAngles(angles);
-            success = robai.move(jointAngles, t);
+            t = [0:st:0.5]';           
+            [joints, vel, acc] = mtraj(@tpoly, curJoints, qHome, length(t));
+            success = robai.move(joints, t);
         end
         
         %% Function to move robot in a trajectory

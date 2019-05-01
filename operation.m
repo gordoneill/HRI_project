@@ -9,7 +9,9 @@ robai      = robot(actin, unity);
 action     = 'rest';
 lastAction = 'rest';
 % trainObj   = train('C:\GitHub\MiniVIE\gordon_finalProj.trainingData');
-robai.goHome(qhome);
+curJoints = robaiBot.ikine(curPose);
+robai.goHome(convertRobotAnglestoJointAngles(curJoints), qhome);
+curPose = homePose;
 
 while ~strcmp(action, 'release')
     %% Collect Data

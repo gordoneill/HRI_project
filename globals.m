@@ -29,11 +29,12 @@ links = [
 
 robaiBot =  SerialLink(links, 'name', 'Cyton Gamma 1500', 'manufacturer', 'Robai');
 
-curPose = SE3(0, 0.2, 0.1)*SE3.rpy(0,-180,0,'deg');
-qHomePlot = robaiBot.ikine(curPose);
-%robaiBot.plot(qHomePlot, 'tilesize', 1)
-%xlim([-1, 1])
-%ylim([-1, 1])
-%zlim([-1, 1])
+homePose = SE3(0, 0.2, 0.1)*SE3.rpy(0,-180,0,'deg');
 
+qHomePlot = robaiBot.ikine(homePose);
+
+
+zeroJoints = [0 pi/2 pi/2 pi/2 pi/2 0 0];
+
+curPose = robaiBot.fkine(zeroJoints);
 qhome = convertRobotAnglestoJointAngles(qHomePlot);

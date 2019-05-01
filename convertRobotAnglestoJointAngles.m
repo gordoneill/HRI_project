@@ -9,7 +9,7 @@ if len == 7
 elseif wid == 7
     numVecs = len;
 else
-    error("Invalid input. One dimension of array must equal 4");
+    error("Invalid input. One dimension of array must equal 7");
     return;
 end
 
