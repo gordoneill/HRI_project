@@ -28,26 +28,23 @@ switch(action)
         axis = 'y';
         pol = -1;
     case 'rotateIn'
-        
     case 'rotateOut'
-        
     case 'rest'
-        
     case 'grip'
-        switch(tool)
-            case 'heart'
-            case 'lung'
-            case 'liver'
-        end
     case 'release'
         
     otherwise
         error('Unsupported move');
+        traj = []; 
+        timesteps = [];
+        return; 
 end
 
 if (isMove)
     % returns array of end effector positions to get to trajectory
     [traj, timesteps ] = move1D(axis, pol); 
+else
+    [traj, timesteps] = moveEndEffector(action, tool);
 end
 
 end 
