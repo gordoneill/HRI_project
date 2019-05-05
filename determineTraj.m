@@ -12,11 +12,11 @@ switch(action)
     case 'left'
         isMove = true;
         axis = 'x';
-        pol = 1;
+        pol = -1;
     case 'right'
         isMove = true;
         axis = 'x';
-        pol = -1;
+        pol = 1;
     case 'forward'
         isMove = true;
         axis = 'y';
