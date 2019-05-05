@@ -4,15 +4,17 @@ global robaiBot;
 global curPose;
 global qhome;
 global toolWidth; 
+global homePose;
 
+tools = ["tweezers"; "scalpel"; "knife"];
+toolWidth = [2.5; 3.0; 3.5]; %cm
 
-tools = ["wrench"; "tweezers"; "scalpel"; "knife"; "probe"];
-toolWidth = [2.5; 3; 4; 1.5; 2];
 commands = ["up"; "down"; "left"; "right"; "forward"; "reverse";...
     "rotateIn"; "rotateOut"; "rest"; "grip"; "release"];
 
 %% DH Parameters were found using DHFactor function
-% s = 'Tz(L1).Rz(q1).Tz(L2).Rx(q2).Ty(L3).Rz(q3).Tx(L4).Ry(q4).Tz(L5).Rx(q5).Ty(L6).Rz(q6).Ty(L7).Ry(q7)';
+% s = 'Tz(L1).Rz(q1).Tz(L2).Rx(q2).Ty(L3).Rz(q3).Tx(L4).Ry(q4).Tz(L5).Rx(q5)....
+%   Ty(L6).Rz(q6).Ty(L7).Ry(q7)';
 % dh = DHFactor(s);
 % cmd = dh.command('robai');
 % robaiBot = eval(cmd);
@@ -32,7 +34,6 @@ robaiBot =  SerialLink(links, 'name', 'Cyton Gamma 1500', 'manufacturer', 'Robai
 homePose = SE3(0, 0.2, 0.1)*SE3.rpy(0,-180,0,'deg');
 
 qHomePlot = robaiBot.ikine(homePose);
-
 
 zeroJoints = [0 pi/2 pi/2 pi/2 pi/2 0 0];
 

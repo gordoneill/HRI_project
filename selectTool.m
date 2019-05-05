@@ -1,7 +1,7 @@
 function tool = selectTool()
 %get list of tools 
 global tools;
-addpath('C:\git\HRI_project\speech2text');
+addpath('speech2text');
 
 % Create speech client for speech2text toolbox 
 speechObject = speechClient('Google','languageCode','en-US');

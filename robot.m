@@ -19,8 +19,8 @@ classdef robot < handle
         %% Function to go to home angles
         function [success] = goHome(robai, curJoints, qHome)
             st = 0.1;
-            t = [0:st:0.5]';           
-            [joints, vel, acc] = mtraj(@tpoly, curJoints, qHome, length(t));
+            t = (0:st:0.5)';           
+            [joints, ~, ~] = mtraj(@tpoly, curJoints, qHome, length(t));
             success = robai.move(joints, t);
         end
         
@@ -54,10 +54,12 @@ classdef robot < handle
         
         %% Function to send the command
         function [success] = sendCommand(robai, jointAngles)
-            %success = robai.actin.putData(typecast(jointAngles, 'uint8'));
-            success = 1;
+            robai.actin.putData(typecast(jointAngles, 'uint8'));
+
             robai.unity.putData(typecast(single(...
                     [rad2deg(jointAngles(1:7)), jointAngles(8)]), 'uint8')); 
+                
+            success = 1;
         end
     end
 end

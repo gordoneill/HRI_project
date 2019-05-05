@@ -1,12 +1,12 @@
 function [ jointAngles, t ] = moveEndEffector(action, tool)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+
 global tools;
 global curPose;
+global robaiBot; 
 
-t = [0:0.05:1]';
-rotAngle = pi/4;
-jointAngles = zeros(1, 8);
+t = (0:0.05:1)';
+rotAngle = pi/8;
+jointAngles = robaiBot.ikine(curPose);
 
 curRPY = curPose.torpy; 
 curRoll = curRPY(1);
@@ -32,4 +32,3 @@ switch(action)
 end
 
 end
-

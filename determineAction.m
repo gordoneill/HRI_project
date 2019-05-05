@@ -1,35 +1,5 @@
 function action = determineAction(trainObj, leapData, myoData)
 
-%% Determine Myo Action
-% Extract features and classify
-features2D = trainObj.extractfeatures(myoData);
-[classDecision, ~] = trainObj.classify(reshape(features2D',[],1));
-
-% Display the resulting class number and name
-classNames = trainObj.getClassNames;
-myoMovement = classNames{classDecision};
-
-switch (myoMovement)
-    case 'Wrist Extend Out'
-        myoAction = 'up';
-    case 'Wrist Flex In'
-        myoAction = 'down';
-    case 'Wrist Adduction'
-        myoAction = 'left';
-    case 'Wrist Abduction'
-        myoAction = 'right';
-    case 'Wrist Rotate In'
-        myoAction = 'rotateIn';
-    case 'Wrist Rotate Out'
-        myoAction = 'rotateOut';
-    case 'Hand Open'
-        myoAction = 'release';
-    case 'Spherical Grasp'
-        myoAction = 'grip';
-    otherwise
-        myoAction = 'rest';
-end
-
 %% Determine Leap Action
 if isfield(leapData, 'hand')
     numHands          = leapData.hands;
@@ -37,8 +7,7 @@ if isfield(leapData, 'hand')
     typicalNumFingers = length(typicalFingers);
     forwardFingers    = {'Index'};
     reverseFingers    = {'Thumb', 'Pinky'};
-%     rotateInFingers   = {'Thumb', 'Index', 'Pinky'};
-%     rotateOutFingers  = {'Thumb', 'Index'};
+    rotateFingers     = {'Thumb', 'Index'};
     angleDegreeThresh = containers.Map(typicalFingers,{35, 25, 25, 25, 40});
     fingersOut        = containers.Map(typicalFingers,{0, 0, 0, 0, 0});
 
@@ -64,8 +33,6 @@ if isfield(leapData, 'hand')
                     
                     fingersOut(fingerName) = (curAngle < angleDegreeThresh(fingerName));
                 end
-                
-                
             end
         end
     end
@@ -87,16 +54,52 @@ if isfield(leapData, 'hand')
         elseif listsMatch(reverseFingers, fingerOutList)
             leapAction = 'reverse';
             break;
-%         elseif listsMatch(rotateInFingers, fingerOutList)
-%             leapAction = 'rotateIn';
-%             break;
-%         elseif listsMatch(rotateOutFingers, fingerOutList)
-%             leapAction = 'rotateOut';
-%             break;
+        elseif listsMatch(rotateFingers, fingerOutList)
+            leapAction = 'rotate';
+            break;
         end
     end
 else
     leapAction = 'rest';
+end
+
+%% Determine Myo Action
+
+% Extract features and classify
+features2D = trainObj.extractfeatures(myoData);
+[classDecision, ~] = trainObj.classify(reshape(features2D',[],1));
+
+% Display the resulting class number and name
+classNames = trainObj.getClassNames;
+myoMovement = classNames{classDecision};
+
+switch (myoMovement)
+    case 'Wrist Extend Out'
+        myoAction = 'up';
+    case 'Wrist Flex In'
+        myoAction = 'down';
+    case 'Wrist Adduction'
+        myoAction = 'left';
+    case 'Wrist Abduction'
+        myoAction = 'right';
+    case 'Wrist Rotate In'
+        if strcmp(leapAction, 'rotate')
+            myoAction = 'rotateIn';
+        else
+            myoAction = 'rest';
+        end
+    case 'Wrist Rotate Out'
+        if strcmp(leapAction, 'rotate')
+            myoAction = 'rotateOut';
+        else
+            myoAction = 'rest';
+        end
+    case 'Hand Open'
+        myoAction = 'release';
+    case 'Spherical Grasp'
+        myoAction = 'grip';
+    otherwise
+        myoAction = 'rest';
 end
 
 %% Return Game Action
