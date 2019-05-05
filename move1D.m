@@ -5,6 +5,7 @@ function  [ jointAngles, t ] = move1D(axis, pol)
 % Here we define the limits in the world frame of the arm
 global robaiBot; 
 global curPose;
+global curJoints; 
 
 deg = pi/180;
 % Joint ranges
@@ -16,10 +17,7 @@ jointAngles = [];
 st = 0.1;
 t = [0:st:1]';
 
-% Cartesian space ranges
-xrange = [-1 1];
-yrange = [0 1];
-zrange = [0.034  0.1]; 
+zrange = [0.03  0.13]; 
 radLims = [0.0 1.5];
 xyDist = 0.05; % 5 cm
 zDist = zrange(2) - zrange(1); %Must fluctuate between 0.02m and 0.1m
@@ -28,13 +26,9 @@ switch(axis)
     case 'x'
         destX = curPose.t(1) + (pol*xyDist); 
         rad = sqrt(destX^2 + curPose.t(2)^2);
-        isDistRange = isinrange(destX, xrange(1), xrange(2));
         isRadRange = isinrange(rad, radLims(1), radLims(2));
-        if isDistRange == -1
-            dist = curPose.t(1) - xrange(1); 
-        elseif  isDistRange == 1
-            dist = xrange(2) - curPose.t(1); 
-        elseif isRadRange == -1
+
+        if isRadRange == -1
             newX = sqrt(radLims(1)^2 - curPose.t(2)^2);
             dist = newX - curPose.t(1);
         elseif isRadRange == 1
@@ -47,13 +41,8 @@ switch(axis)
     case 'y'
         destY = curPose.t(2) + (pol*xyDist); 
         rad = sqrt(destY^2 + curPose.t(1)^2);
-        isDistRange = isinrange(destY, yrange(1), yrange(2));
         isRadRange = isinrange(rad, radLims(1), radLims(2));
-        if isDistRange == -1
-            dist = curPose.t(2) - yrange(1); 
-        elseif  isDistRange == 1
-            dist = yrange(2) - curPose.t(2); 
-        elseif isRadRange == -1
+        if isRadRange == -1
             newY = sqrt(radLims(1)^2 - curPose.t(1)^2);
             dist = newY - curPose.t(2);
         elseif isRadRange == 1
@@ -79,10 +68,15 @@ switch(axis)
         disp("Invalid input.");
         return;
 end
+
+if (translation == SE3(0, 0, 0))
+   fprintf("Reached axis %s limit.\n", axis);
+   return;
+end
+
 destPose = curPose * translation;
 
-% start = robaiBot.ikine(curPose, 'mask', [1 1 1 0 0 1]);
-dest = robaiBot.ikine(destPose, 'mask', [1 1 1 0 0 1]);
+dest = robaiBot.ikine(destPose, 'mask', [1 1 1 0 0 0]);
 
 % Check joint angle ranges 
 for i=1:length(dest)
@@ -102,15 +96,11 @@ for i=1:length(dest)
     end
 end
 
-poses = curPose.interp(destPose, tpoly(0, 1, t));
-% disp(destPose);
-angles = zeros(length(dest), length(poses));
+via = [curJoints; convertRobotAnglestoJointAngles(dest)];
+[s, ~, ~] = mstraj(via, [0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1], [], via(1, :), (t(2) - t(1)), 0.2);
 
-for i=1:length(poses)
-    angles(:, i) = robaiBot.ikine(poses(i), 'mask', [1 1 1 0 0 1]);
-end
-% disp(angles);
-jointAngles = convertRobotAnglestoJointAngles(angles);
+jointAngles = s;
 curPose = destPose;
+
 end
 

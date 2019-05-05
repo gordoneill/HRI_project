@@ -1,4 +1,4 @@
-function [traj, timesteps] = determineTraj(action, tool)
+function [traj, timesteps] = determineTraj(action)
 
 switch(action)
     case 'up'
@@ -12,26 +12,24 @@ switch(action)
     case 'left'
         isMove = true;
         axis = 'x';
-        pol = -1;
+        pol = 1;
     case 'right'
         isMove = true;
         axis = 'x';
-        pol = 1;
+        pol = -1;
     case 'forward'
         isMove = true;
         axis = 'y';
-        pol = 1;
+        pol = -1;
     case 'reverse'
         isMove = true;
         axis = 'y';
-        pol = -1;
+        pol = 1;
     case 'rotateIn'
         isMove = false;
     case 'rotateOut'
         isMove = false;
     case 'rest'
-        isMove = false;
-    case 'grip'
         isMove = false;
     case 'release'
         isMove = false;
@@ -43,7 +41,7 @@ if (isMove)
     % returns array of end effector positions to get to trajectory
     [traj, timesteps] = move1D(axis, pol); 
 else
-    [traj, timesteps] = moveEndEffector(action, tool);
+    [traj, timesteps] = moveEndEffector(action);
 end
 
 end 

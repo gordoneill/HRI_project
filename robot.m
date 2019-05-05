@@ -17,20 +17,20 @@ classdef robot < handle
         end
         
         %% Function to go to home angles
-        function [success] = goHome(robai, qHome)
+        function [angles] = goHome(robai, qHome)
             robai.jointAngles = qHome;
-            success = robai.sendCommand(robai.jointAngles);
+            angles = robai.sendCommand(robai.jointAngles);
+            pause(2);
         end
         
         %% Function to move robot in a trajectory
-        function [success] = move(robai, traj, timesteps)
+        function [angles] = move(robai, traj, timesteps)
             timediff = timesteps(2) - timesteps(1);
             for step = 1:size(traj, 1)
                 robai.jointAngles = traj(step, :);
-                success = robai.sendCommand(robai.jointAngles);
+                angles = robai.sendCommand(robai.jointAngles);
                 pause(timediff);
             end
-            
         end
         
         %% Function to move specific robot joint
@@ -51,13 +51,12 @@ classdef robot < handle
         end
         
         %% Function to send the command
-        function [success] = sendCommand(robai, jointAngles)
+        function [angles] = sendCommand(robai, jointAngles)
             robai.actin.putData(typecast(jointAngles, 'uint8'));
 
 %             robai.unity.putData(typecast(single(...
 %                     [rad2deg(jointAngles(1:7)), jointAngles(8)]), 'uint8')); 
-                
-            success = 1;
+            angles = jointAngles;
         end
     end
 end

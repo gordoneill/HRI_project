@@ -1,27 +1,28 @@
-function [ jointAngles, t ] = moveEndEffector(action, tool)
+function [ jointAngles, t ] = moveEndEffector(action)
 
-global tools;
-global curPose;
-global robaiBot; 
+% global curPose;
+global openWidth;
+global curJoints;
 
 t = (0:0.05:1)';
 rotAngle = pi/8;
-jointAngles = robaiBot.ikine(curPose);
 
-curRPY = curPose.torpy; 
-curRoll = curRPY(1);
-openWidth = 0.09; 
+jointAngles = curJoints;
 
+% curRPY = curPose.torpy; 
+% curRoll = curRPY(1);
+ 
 switch(action)
     case 'rotateIn'
-        jointAngles(7) = curRoll + rotAngle; 
+        isrange = isinrange(curJoints(7) + rotAngle, deg2rad(-150), deg2rad(150));
+        if (isrange == 0)
+            jointAngles(7) = curJoints(7) + rotAngle;
+        end
     case 'rotateOut'
-        jointAngles(7) = curRoll - rotAngle;  
-    case 'grip'
-        %% Define width based on tool selected
-        width = 0.002;
-        % need to keep track of current width? should be openWidth...
-        jointAngles(8) = width;
+        isrange = isinrange(curJoints(7) - rotAngle, deg2rad(-150), deg2rad(150));
+        if (isrange == 0)
+            jointAngles(7) = curJoints(7) - rotAngle; 
+        end
     case 'release'
         jointAngles(8) = openWidth;   
 end

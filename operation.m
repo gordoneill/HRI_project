@@ -1,40 +1,56 @@
 function operation()
 global qhome;
+global curJoints;
+global curPose;
 %% Init Game
 globals;
 [myo, leap, actin, unity] = initExternalDevices();
+robai       = robot(actin, unity);
+organsMoved = containers.Map(organs,{0, 0, 0});
+trainObj    = train('gordon.trainingData');
 
-tool       = 'brain';%selectTool();
-robai      = robot(actin, unity);
-action     = 'rest';
-lastAction = 'rest';
-trainObj   = train('C:\GitHub\MiniVIE\gordon_test.trainingData');
-robai.goHome(qhome);
-pause(2);
-grabTool(tool, t, robai);
-
-while ~strcmp(action, 'release')
-    %% Collect Data
-    myoData  = collectMyoData(myo, trainObj);
-    leapData = collectLeapData(leap);
-
-    %% Determine Action
-    action = determineAction(trainObj, leapData, myoData);
-    
-    if ~strcmp(action, 'rest') && strcmp(action, lastAction) % need action twice to enact
-        [traj, timesteps]  = determineTraj(action, tool);
-
-        % Move Robot
-        if ~isempty(traj)
-            disp('Moving');
-            robai.move(traj, timesteps); 
-            action = 'rest';
-        end
-    else
-        pause(0.1);        
+while (~organsMoved(organs(1)) || ~organsMoved(organs(2)) || ~organsMoved(organs(3)))
+    organ = selectOrgan();
+    while organsMoved(organ)
+        disp('Please select unmoved organ');
+        organ = selectOrgan();
     end
-    lastAction = action;
+
+    lastAction = 'rest';
+    curJoints = robai.goHome(qhome);
+    curPose = homePose;
+    pause(1)
+    grabOrgan(organ, t, robai);
+    
+    while ~organsMoved(organ)
+        %% Collect Data
+        myoData  = collectMyoData(myo, trainObj);
+        leapData = collectLeapData(leap);
+
+        %% Determine Action
+        action = determineAction(trainObj, leapData, myoData);
+        %action = input('direction?');
+        
+        if ~strcmp(action, 'rest') && strcmp(action, lastAction) % need action twice to enact
+            [traj, timesteps]  = determineTraj(action);
+
+            % Move Robot
+            if ~isempty(traj)
+                disp('Moving');
+                curJoints = robai.move(traj, timesteps); 
+                if strcmp(action, 'release')
+                    organsMoved(organ) = 1;
+                    pause(4);
+                end
+            end
+        else
+            pause(0.1);        
+        end
+        lastAction = action;
+    end
 end
 
+disp('GAME OVER');
 robai.goHome(qhome);
+pause;
 cleanup;

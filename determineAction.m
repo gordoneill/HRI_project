@@ -79,9 +79,9 @@ switch (myoMovement)
     case 'Wrist Flex In'
         myoAction = 'down';
     case 'Wrist Adduction'
-        myoAction = 'left';
-    case 'Wrist Abduction'
         myoAction = 'right';
+    case 'Wrist Abduction'
+        myoAction = 'left';
     case 'Wrist Rotate In'
         if strcmp(leapAction, 'rotate')
             myoAction = 'rotateIn';
@@ -96,8 +96,6 @@ switch (myoMovement)
         end
     case 'Hand Open'
         myoAction = 'release';
-    case 'Spherical Grasp'
-        myoAction = 'grip';
     otherwise
         myoAction = 'rest';
 end
@@ -105,6 +103,8 @@ end
 %% Return Game Action
 if strcmp(leapAction, 'rest')
     action = myoAction;
+elseif strcmp(leapAction, 'rotate')
+    action = 'rest';
 else
     action = leapAction;
 end
