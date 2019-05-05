@@ -10,7 +10,7 @@ jointAngles = robaiBot.ikine(curPose);
 
 curRPY = curPose.torpy; 
 curRoll = curRPY(1);
-openWidth = 5; 
+openWidth = 0.09; 
 
 switch(action)
     case 'rotateIn'
@@ -19,12 +19,7 @@ switch(action)
         jointAngles(7) = curRoll - rotAngle;  
     case 'grip'
         %% Define width based on tool selected
-        width = 0;
-        for i=1:length(tools)
-           if strcmp(tool, tools(i))
-               width = toolWidth(i);
-           end
-        end
+        width = 0.002;
         % need to keep track of current width? should be openWidth...
         jointAngles(8) = width;
     case 'release'

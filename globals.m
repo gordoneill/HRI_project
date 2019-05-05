@@ -3,11 +3,11 @@ global commands;
 global robaiBot;
 global curPose;
 global qhome;
-global toolWidth; 
-global homePose;
+global heartTraj;
+global stomachTraj;
+global brainTraj;
 
-tools = ["tweezers"; "scalpel"; "knife"];
-toolWidth = [2.5; 3.0; 3.5]; %cm
+tools = ["heart"; "stomach"; "brain"];
 
 commands = ["up"; "down"; "left"; "right"; "forward"; "reverse";...
     "rotateIn"; "rotateOut"; "rest"; "grip"; "release"];
@@ -20,22 +20,38 @@ commands = ["up"; "down"; "left"; "right"; "forward"; "reverse";...
 % robaiBot = eval(cmd);
 %%
 links = [   
- 		  Revolute('d', 0.17735, 'a', 0,         'alpha', pi/2,  'offset', pi/2)
- 		  Revolute('d', 0,       'a', 0.12583,   'alpha', -pi/2, 'offset', 0)
- 		  Revolute('d', 0,       'a', 0.11538,   'alpha', pi/2,  'offset', -pi/2)
- 		  Revolute('d', 0,       'a', -0.09752,  'alpha', pi/2,  'offset', pi/2)
- 		  Revolute('d', 0,       'a', 0.07164,   'alpha', pi/2,  'offset', pi/2)
- 		  Revolute('d', 0,       'a', 0,         'alpha', -pi/2, 'offset', -pi/2)
- 		  Revolute('d', 0.17252, 'a', 0,         'alpha', 0,     'offset', 0)
+            Revolute('d', 0.17735, 'a', 0, 'alpha', pi/2) % 0.17735 = distance(L1-L0)
+            Revolute('d', 0, 'a', 0.24212, 'alpha', 0) % 0.24212 = distance(L3-L1)
+            Revolute('d', 0, 'a', 0.26, 'alpha', 0) % 0.34168 = distance(end - L3)
+            Revolute('d', 0, 'a', 0.12, 'alpha', 0)
         ];
 
 robaiBot =  SerialLink(links, 'name', 'Cyton Gamma 1500', 'manufacturer', 'Robai');
+% robaiBot.base = SE3.Rz(deg2rad(-111));
 
-homePose = SE3(0, 0.2, 0.1)*SE3.rpy(0,-180,0,'deg');
+curPose = SE3(0, 0.3, 0.13)*SE3.rpy(0,0,0,'deg'); %0.396
 
-qHomePlot = robaiBot.ikine(homePose);
+qHomePlot = robaiBot.ikine(curPose, 'mask', [1 1 1 0 0 1]);
 
-zeroJoints = [0 pi/2 pi/2 pi/2 pi/2 0 0];
-
-curPose = robaiBot.fkine(zeroJoints);
 qhome = convertRobotAnglestoJointAngles(qHomePlot);
+
+qHeartInitPos = [deg2rad([-149, 55, 0, 80, 0, 50, -40]) 0.0099]; 
+qStomachInitPos = [deg2rad([-135, 45, 0, 98, 0, 40, -30]) 0.0099];
+qBrainInitPos = [deg2rad([-114, 40, 0, 109, 0, 35, -5]) 0.0099];
+
+% qHeartLoc = SE3(.03, 0.28, 0.055);
+% qLungLoc = SE3(.13, 0.28, 0.055);
+% qBrainLoc = SE3(.25, 0.28, 0.055);
+t = [0:0.1:2]';
+% poses = curPose.interp(qHeartLoc, tpoly(0, 1, t));
+
+heartTraj = jtraj(qhome, qHeartInitPos, length(t));
+stomachTraj = jtraj(qhome, qStomachInitPos, length(t));
+brainTraj = jtraj(qhome, qBrainInitPos, length(t));
+% for i=1:length(poses)
+%     qHeartTraj(:,i) = robaiBot.ikine(poses(i), 'mask', [1 1 1 0 0 1]);
+% end
+
+% qLungJointAngles = robaiBot.ikine(qLungLoc, 'mask', [1 1 1 0 0 1]);
+% qBrainJointAngles = robaiBot.ikine(qBrainLoc, 'mask', [1 1 1 0 0 1]);
+

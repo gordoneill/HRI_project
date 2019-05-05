@@ -1,18 +1,17 @@
 function operation()
 global qhome;
-global curPose;
 %% Init Game
 globals;
 [myo, leap, actin, unity] = initExternalDevices();
 
-tool       = selectTool();
+tool       = 'brain';%selectTool();
 robai      = robot(actin, unity);
 action     = 'rest';
 lastAction = 'rest';
-trainObj   = train('C:\GitHub\MiniVIE\gordon_finalProj.trainingData');
-curJoints = robaiBot.ikine(curPose);
-robai.goHome(convertRobotAnglestoJointAngles(curJoints), qhome);
-curPose = homePose;
+trainObj   = train('C:\GitHub\MiniVIE\gordon_test.trainingData');
+robai.goHome(qhome);
+pause(2);
+grabTool(tool, t, robai);
 
 while ~strcmp(action, 'release')
     %% Collect Data
@@ -37,7 +36,5 @@ while ~strcmp(action, 'release')
     lastAction = action;
 end
 
-curJoints = robaiBot.ikine(curPose);
-robai.goHome(convertRobotAnglestoJointAngles(curJoints), qhome);
-curPose = homePose;
+robai.goHome(qhome);
 cleanup;

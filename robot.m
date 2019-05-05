@@ -5,7 +5,7 @@ classdef robot < handle
         actin
         unity
         numJoints = 8;
-        homeValues = [0 0 0 0 0 0 0 0];
+        homeValues = [0 0 0 0 0 0 0 0.005];
     end
     
     methods
@@ -17,11 +17,9 @@ classdef robot < handle
         end
         
         %% Function to go to home angles
-        function [success] = goHome(robai, curJoints, qHome)
-            st = 0.1;
-            t = (0:st:0.5)';           
-            [joints, ~, ~] = mtraj(@tpoly, curJoints, qHome, length(t));
-            success = robai.move(joints, t);
+        function [success] = goHome(robai, qHome)
+            robai.jointAngles = qHome;
+            success = robai.sendCommand(robai.jointAngles);
         end
         
         %% Function to move robot in a trajectory
@@ -56,8 +54,8 @@ classdef robot < handle
         function [success] = sendCommand(robai, jointAngles)
             robai.actin.putData(typecast(jointAngles, 'uint8'));
 
-            robai.unity.putData(typecast(single(...
-                    [rad2deg(jointAngles(1:7)), jointAngles(8)]), 'uint8')); 
+%             robai.unity.putData(typecast(single(...
+%                     [rad2deg(jointAngles(1:7)), jointAngles(8)]), 'uint8')); 
                 
             success = 1;
         end

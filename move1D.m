@@ -8,56 +8,64 @@ global curPose;
 
 deg = pi/180;
 % Joint ranges
-mins = [-150 -15 -15 -15 -15 -105 -150]*deg; 
-maxs = [ 150 195 195 195 195  105  150]*deg;
+mins = [-180 -15  -105 -105]*deg; 
+maxs = [180  90  105  105]*deg;
 jointAngles = [];
 
 % Create the trajectory 
 st = 0.1;
-t = [0:st:0.5]';
+t = [0:st:1]';
 
 % Cartesian space ranges
-zrange = [0.03  0.10]; 
-radLims = [0.15 0.3944];
+xrange = [-1 1];
+yrange = [0 1];
+zrange = [0.034  0.1]; 
+radLims = [0.0 1.5];
 xyDist = 0.05; % 5 cm
 zDist = zrange(2) - zrange(1); %Must fluctuate between 0.02m and 0.1m
 
 switch(axis)
     case 'x'
-        destX = curPose.t(1) - (pol*xyDist); 
-        rad = sqrt((destX^2) + (curPose.t(2)^2));
+        destX = curPose.t(1) + (pol*xyDist); 
+        rad = sqrt(destX^2 + curPose.t(2)^2);
+        isDistRange = isinrange(destX, xrange(1), xrange(2));
         isRadRange = isinrange(rad, radLims(1), radLims(2));
-
-        if isRadRange == -1
+        if isDistRange == -1
+            dist = curPose.t(1) - xrange(1); 
+        elseif  isDistRange == 1
+            dist = xrange(2) - curPose.t(1); 
+        elseif isRadRange == -1
             newX = sqrt(radLims(1)^2 - curPose.t(2)^2);
-            dist = newX - abs(curPose.t(1));
+            dist = newX - curPose.t(1);
         elseif isRadRange == 1
             newX = sqrt(radLims(2)^2 - curPose.t(2)^2);
-            dist = newX - abs(curPose.t(1));
+            dist = newX - curPose.t(1);
         else 
             dist = xyDist;
         end 
-        
         translation = SE3(pol*dist, 0, 0);
     case 'y'
         destY = curPose.t(2) + (pol*xyDist); 
-        rad = sqrt((destY^2) + (curPose.t(1)^2));
+        rad = sqrt(destY^2 + curPose.t(1)^2);
+        isDistRange = isinrange(destY, yrange(1), yrange(2));
         isRadRange = isinrange(rad, radLims(1), radLims(2));
-
-        if isRadRange == -1
+        if isDistRange == -1
+            dist = curPose.t(2) - yrange(1); 
+        elseif  isDistRange == 1
+            dist = yrange(2) - curPose.t(2); 
+        elseif isRadRange == -1
             newY = sqrt(radLims(1)^2 - curPose.t(1)^2);
-            dist = newY - abs(curPose.t(2));
+            dist = newY - curPose.t(2);
         elseif isRadRange == 1
             newY = sqrt(radLims(2)^2 - curPose.t(1)^2);
-            dist = newY - abs(curPose.t(2));
+            dist = newY - curPose.t(2);
         else
             dist = xyDist;
         end 
-        
         translation = SE3(0, pol*dist, 0);        
     case 'z'
         if (((pol == 1) && (curPose.t(3) == zrange(1))) || ((pol == -1) && (curPose.t(3) == zrange(2))))
-            translation = SE3(0, 0, -1*pol*zDist);  
+            translation = SE3(0, 0, pol*zDist);  
         else
             if (pol == 1)
                fprintf("Cannot go up. Already at up position.\n");
@@ -71,15 +79,10 @@ switch(axis)
         disp("Invalid input.");
         return;
 end
-
-if (translation == SE3(0, 0, 0))
-    fprintf("Reached axis %s limit.\n", axis);
-    return;
-end
-
 destPose = curPose * translation;
 
-dest = robaiBot.ikine(destPose);
+% start = robaiBot.ikine(curPose, 'mask', [1 1 1 0 0 1]);
+dest = robaiBot.ikine(destPose, 'mask', [1 1 1 0 0 1]);
 
 % Check joint angle ranges 
 for i=1:length(dest)
@@ -101,21 +104,13 @@ end
 
 poses = curPose.interp(destPose, tpoly(0, 1, t));
 % disp(destPose);
-if (length(dest) ~= 7)
-    disp('Unable to compute trajectory'); 
-else
-    angles = zeros(length(dest), length(poses));
+angles = zeros(length(dest), length(poses));
 
-    for i=1:length(poses)
-         curAngles = robaiBot.ikine(poses(i));
-         if (isempty(curAngles))
-            angles(:, i) = angles(:,i); 
-         end
-         angles(:, i) = curAngles;
-    end
-    
-    jointAngles = convertRobotAnglestoJointAngles(angles);
-    curPose = destPose;
-end 
+for i=1:length(poses)
+    angles(:, i) = robaiBot.ikine(poses(i), 'mask', [1 1 1 0 0 1]);
+end
+% disp(angles);
+jointAngles = convertRobotAnglestoJointAngles(angles);
+curPose = destPose;
 end
 
