@@ -7,7 +7,7 @@ if isfield(leapData, 'hand')
     typicalNumFingers = length(typicalFingers);
     forwardFingers    = {'Index'};
     reverseFingers    = {'Thumb', 'Pinky'};
-    rotateFingers     = {'Thumb', 'Index'};
+    %rotateFingers     = {'Thumb', 'Index'};
     angleDegreeThresh = containers.Map(typicalFingers,{35, 25, 25, 25, 40});
     fingersOut        = containers.Map(typicalFingers,{0, 0, 0, 0, 0});
 
@@ -54,9 +54,9 @@ if isfield(leapData, 'hand')
         elseif listsMatch(reverseFingers, fingerOutList)
             leapAction = 'reverse';
             break;
-        elseif listsMatch(rotateFingers, fingerOutList)
-            leapAction = 'rotate';
-            break;
+%         elseif listsMatch(rotateFingers, fingerOutList)
+%             leapAction = 'rotate';
+%             break;
         end
     end
 else
@@ -83,17 +83,9 @@ switch (myoMovement)
     case 'Wrist Abduction'
         myoAction = 'left';
     case 'Wrist Rotate In'
-        if strcmp(leapAction, 'rotate')
-            myoAction = 'rotateIn';
-        else
-            myoAction = 'rest';
-        end
+        myoAction = 'rotateIn';
     case 'Wrist Rotate Out'
-        if strcmp(leapAction, 'rotate')
-            myoAction = 'rotateOut';
-        else
-            myoAction = 'rest';
-        end
+        myoAction = 'rotateOut';
     case 'Hand Open'
         myoAction = 'release';
     otherwise
@@ -103,8 +95,6 @@ end
 %% Return Game Action
 if strcmp(leapAction, 'rest')
     action = myoAction;
-elseif strcmp(leapAction, 'rotate')
-    action = 'rest';
 else
     action = leapAction;
 end
