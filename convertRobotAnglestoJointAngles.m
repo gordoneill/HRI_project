@@ -1,5 +1,5 @@
 function [jointAngles] = convertRobotAnglestoJointAngles(robotAngles)
-global gripWidth;
+global gripState;
 [len, wid] = size(robotAngles);
 numVecs = 0;
 %one dimension should be 7. the other determines the number of vectors we
@@ -24,6 +24,6 @@ robotAngles(:, 2:5) = robotAngles(:, 2:5) - (pi/2);
 jointAngles = zeros(numVecs, 8);
 
 jointAngles(:, 1:7) = robotAngles(:, 1:7);
-jointAngles(:, 8) = gripWidth;
+jointAngles(:, 8) = gripState;
 end
 

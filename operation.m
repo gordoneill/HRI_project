@@ -10,7 +10,7 @@ organsMoved = containers.Map(organs,{0, 0, 0});
 trainObj    = train('gordon.trainingData');
 
 while (~organsMoved(organs(1)) || ~organsMoved(organs(2)) || ~organsMoved(organs(3)))
-    organ = 'heart'; %selectOrgan();
+    organ = selectOrgan();
     while organsMoved(organ)
         disp('Please select unmoved organ');
         organ = selectOrgan();
@@ -20,7 +20,7 @@ while (~organsMoved(organs(1)) || ~organsMoved(organs(2)) || ~organsMoved(organs
     curJoints = robai.goHome(qhome);
     curPose = homePose;
     pause(1)
-    grabOrgan(organ, t, robai);
+    %grabOrgan(organ, t, robai);
     
     while ~organsMoved(organ)
         %% Collect Data
@@ -28,7 +28,7 @@ while (~organsMoved(organs(1)) || ~organsMoved(organs(2)) || ~organsMoved(organs
 %         leapData = collectLeapData(leap);
 
         %% Determine Action
-%         action = determineAction(trainObj, leapData, myoData);
+        %action = determineAction(trainObj, leapData, myoData);
         action = input('direction?');
         
         if ~strcmp(action, 'rest') && strcmp(action, lastAction) % need action twice to enact
@@ -40,8 +40,10 @@ while (~organsMoved(organs(1)) || ~organsMoved(organs(2)) || ~organsMoved(organs
                 curJoints = robai.move(traj, timesteps); 
                 if strcmp(action, 'release')
                     organsMoved(organ) = 1;
+                    curJoints = robai.goHome(qhome);
                     pause(2);
                 end
+                action = 'rest';
             end
         else
             pause(0.1);        

@@ -33,6 +33,8 @@ switch(action)
         isMove = false;
     case 'release'
         isMove = false;
+    case 'grip'
+        isMove = false;
     otherwise
         error('Unsupported move');
 end

@@ -88,6 +88,8 @@ switch (myoMovement)
         myoAction = 'rotateOut';
     case 'Hand Open'
         myoAction = 'release';
+    case 'Spherical Grasp'
+        myoAction = 'grip';
     otherwise
         myoAction = 'rest';
 end

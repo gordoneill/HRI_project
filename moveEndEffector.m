@@ -1,17 +1,14 @@
 function [ jointAngles, t ] = moveEndEffector(action)
 
-global curPose;
 global openWidth;
 global curJoints;
-global robaiBot;
+global gripWidth;
+global gripState; 
 
 t = (0:0.05:1)';
 rotAngle = pi/8;
 
 jointAngles = curJoints;
-
-% curRPY = curPose.torpy; 
-% curRoll = curRPY(1);
  
 switch(action)
     case 'rotateIn'
@@ -26,8 +23,10 @@ switch(action)
         end
     case 'release'
         jointAngles(8) = openWidth;   
+        gripState = openWidth;
+    case 'grip'
+        jointAngles(8) = gripWidth; 
+        gripState = gripWidth;
 end
-
-% curPose = robaiBot.fkine(jointAngles);
 
 end

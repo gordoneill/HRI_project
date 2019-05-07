@@ -54,8 +54,8 @@ classdef robot < handle
         function [angles] = sendCommand(robai, jointAngles)
             robai.actin.putData(typecast(jointAngles, 'uint8'));
 
-%             robai.unity.putData(typecast(single(...
-%                     [rad2deg(jointAngles(1:7)), jointAngles(8)]), 'uint8')); 
+            robai.unity.putData(typecast(single(...
+                     [rad2deg(jointAngles(1:7)), jointAngles(8)]), 'uint8')); 
             angles = jointAngles;
         end
     end

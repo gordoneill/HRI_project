@@ -8,7 +8,7 @@ global stomachTraj;
 global brainTraj;
 global openWidth;
 global gripWidth;
-
+global gripState
 organs = ["heart"; "stomach"; "brain"];
 
 commands = ["up"; "down"; "left"; "right"; "forward"; "reverse";...
@@ -33,6 +33,7 @@ robaiBot =  SerialLink(links, 'name', 'Cyton Gamma 1500', 'manufacturer', 'Robai
 homePose = SE3(0, 0.2, 0.13)*SE3.rpy(0,-180,0);
 
 qHomePlot = robaiBot.ikine(homePose);
+gripState = openWidth;
 
 qhome = convertRobotAnglestoJointAngles(qHomePlot);
 qhome = [qhome(1:7) openWidth];
